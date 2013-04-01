@@ -1,0 +1,20 @@
+{
+    "name":         "geoffroy-aubry/logger",
+    "description":  "bla bla",
+    "keywords":     ["bla"],
+    "type":         "library",
+    "license":      "LGPL-3.0+",
+    "authors":      [
+        {
+            "name":     "Geoffroy Aubry",
+            "email":    "gaubry@hi-media.com"
+        }
+    ],
+    "require": {
+        "php": ">=5.3.3",
+        "psr/log": "1.0.0"
+    },
+    "autoload": {
+        "psr-0": {"GAubry\\Logger": "src/"}
+    }
+}
