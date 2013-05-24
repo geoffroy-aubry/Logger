@@ -112,16 +112,18 @@ class ColoredIndentedLogger extends AbstractLogger
             }
 
             if (isset($this->_aRawColors[$sMsgLevel]) || isset($aContext[$this->_sColorTagPrefix . $sMsgLevel])) {
-                $sMessage = '{' . $this->_sColorTagPrefix . $sMsgLevel . '}' . $sMessage;
-                $bAddResetColorSeq = true;
+                $sImplicitColor = '{' . $this->_sColorTagPrefix . $sMsgLevel . '}';
+                $sMessage = $sImplicitColor . $sMessage;
             } else {
                 $iNbColorTags = preg_match_all('/{C.[A-Za-z0-9_.]+}/', $sMessage, $aMatches);
-                $bAddResetColorSeq = false;
+                $sImplicitColor = '';
             }
             $sMessage = $this->_interpolateContext($sMessage, $aContext);
+            $sIndent = str_repeat($this->_sBaseIndentation, $iCurrIndentationLvl);
+            $sMessage = $sIndent . str_replace("\n", "\n$sIndent$sImplicitColor", $sMessage);
             $sMessage = strtr($sMessage, $this->_aColorsWithTag);
             if (
-                $bAddResetColorSeq
+                $sImplicitColor != ''
                 || (
                     $iNbColorTags > 0
                     && preg_match_all('/{C.[A-Za-z0-9_.]+}/', $sMessage, $aMatches) < $iNbColorTags
@@ -130,8 +132,7 @@ class ColoredIndentedLogger extends AbstractLogger
                 $sMessage .= $this->_sResetColorSequence;
             }
 
-            $sIndent = str_repeat($this->_sBaseIndentation, $iCurrIndentationLvl);
-            echo $sIndent . $sMessage . PHP_EOL;
+            echo $sMessage . PHP_EOL;
         }
     }
 }
