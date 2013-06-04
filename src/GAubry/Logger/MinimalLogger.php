@@ -12,7 +12,7 @@ class MinimalLogger extends AbstractLogger
      * @param string $iMinMsgLevel Seuil d'importance à partir duquel accepter de loguer un message.
      * @see \Psr\Log\LogLevel
      */
-    public function __construct ($sMinMsgLevel=LogLevel::DEBUG)
+    public function __construct ($sMinMsgLevel = LogLevel::DEBUG)
     {
         parent::__construct($sMinMsgLevel);
     }
@@ -25,11 +25,11 @@ class MinimalLogger extends AbstractLogger
      * @param array $context
      * @return null
      */
-    public function log ($sMsgLevel, $sMessage, array $aContext=array())
+    public function log ($sMsgLevel, $sMessage, array $aContext = array())
     {
-        $this->_checkMsgLevel($sMsgLevel);
-        if (self::$_aIntLevels[$sMsgLevel] >= $this->_iMinMsgLevel) {
-            echo $this->_interpolateContext($sMessage, $aContext) . PHP_EOL;
+        $this->checkMsgLevel($sMsgLevel);
+        if (self::$aIntLevels[$sMsgLevel] >= $this->iMinMsgLevel) {
+            echo $this->interpolateContext($sMessage, $aContext) . PHP_EOL;
         }
     }
 }

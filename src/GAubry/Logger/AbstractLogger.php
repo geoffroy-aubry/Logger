@@ -10,9 +10,9 @@ abstract class AbstractLogger extends \Psr\Log\AbstractLogger
      * Seuil d'importance à partir duquel accepter de loguer un message.
      * @var int
      */
-    protected $_iMinMsgLevel;
+    protected $iMinMsgLevel;
 
-    protected static $_aIntLevels = array(
+    protected static $aIntLevels = array(
         LogLevel::DEBUG => 0,
         LogLevel::INFO => 10,
         LogLevel::NOTICE => 20,
@@ -29,15 +29,15 @@ abstract class AbstractLogger extends \Psr\Log\AbstractLogger
      * @param string $iMinMsgLevel Seuil d'importance à partir duquel accepter de loguer un message.
      * @see \Psr\Log\LogLevel
     */
-    protected function __construct ($sMinMsgLevel=LogLevel::DEBUG)
+    protected function __construct ($sMinMsgLevel = LogLevel::DEBUG)
     {
-        $this->_checkMsgLevel($sMinMsgLevel);
-        $this->_iMinMsgLevel = self::$_aIntLevels[$sMinMsgLevel];
+        $this->checkMsgLevel($sMinMsgLevel);
+        $this->iMinMsgLevel = self::$aIntLevels[$sMinMsgLevel];
     }
 
-    protected function _checkMsgLevel ($sMsgLevel)
+    protected function checkMsgLevel ($sMsgLevel)
     {
-        if ( ! isset(self::$_aIntLevels[$sMsgLevel])) {
+        if (! isset(self::$aIntLevels[$sMsgLevel])) {
             $sErrorMsg = "Unkown level: '$sMsgLevel'! Level MUST be defined in \Psr\Log\LogLevel class.";
             throw new \InvalidArgumentException($sErrorMsg, 1);
         }
@@ -46,7 +46,7 @@ abstract class AbstractLogger extends \Psr\Log\AbstractLogger
     /**
      * Interpolates context values into the message placeholders.
      */
-    protected function _interpolateContext ($sMessage, array $aContext)
+    protected function interpolateContext ($sMessage, array $aContext)
     {
         // build a replacement array with braces around the context keys
         $aReplace = array();

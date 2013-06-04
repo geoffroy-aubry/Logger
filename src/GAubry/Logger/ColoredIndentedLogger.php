@@ -6,28 +6,28 @@ use \Psr\Log\LogLevel;
 
 class ColoredIndentedLogger extends AbstractLogger
 {
-    private $_aRawColors;
-    private $_aColorsWithTag;
+    private $aRawColors;
+    private $aColorsWithTag;
 
     /**
      * Valeur d'un niveau d'indentation.
      * @var string
      */
-    private $_sBaseIndentation;
+    private $sBaseIndentation;
 
-    private $_sIndentTag;
-    private $_sUnindentTag;
-    private $_sIndentTagLength;
-    private $_sUnindentTagLength;
+    private $sIndentTag;
+    private $sUnindentTag;
+    private $sIndentTagLength;
+    private $sUnindentTagLength;
 
-    private $_sResetColorSequence;
-    private $_sColorTagPrefix;
+    private $sResetColorSequence;
+    private $sColorTagPrefix;
 
     /**
      * Niveau de l'indentation courante (commence à 0).
      * @var int
      */
-    private $_iIndentationLevel;
+    private $iIndentationLevel;
 
     /**
      * Constructeur.
@@ -38,32 +38,66 @@ class ColoredIndentedLogger extends AbstractLogger
     public function __construct (
         array $aColors,
         $sBaseIndentation,
-        $sIndentTag='+++',
-        $sUnindentTag='---',
-        $sMinMsgLevel=LogLevel::DEBUG,
-        $sResetColorSequence="\033[0m",
-        $sColorTagPrefix='C.'
+        $sIndentTag = '+++',
+        $sUnindentTag = '---',
+        $sMinMsgLevel = LogLevel::DEBUG,
+        $sResetColorSequence = "\033[0m",
+        $sColorTagPrefix = 'C.'
     ) {
         parent::__construct($sMinMsgLevel);
-        $this->_sBaseIndentation = $sBaseIndentation;
-        $this->_sIndentTag = $sIndentTag;
-        $this->_sIndentTagLength = strlen($sIndentTag);
-        $this->_sUnindentTag = $sUnindentTag;
-        $this->_sUnindentTagLength = strlen($sUnindentTag);
-        $this->_iIndentationLevel = 0;
-        $this->_sResetColorSequence = $sResetColorSequence;
-        $this->_sColorTagPrefix = $sColorTagPrefix;
-        $this->_aRawColors = $aColors;
-        $this->_buildColorTags();
+        $this->sBaseIndentation = $sBaseIndentation;
+        $this->sIndentTag = $sIndentTag;
+        $this->sIndentTagLength = strlen($sIndentTag);
+        $this->sUnindentTag = $sUnindentTag;
+        $this->sUnindentTagLength = strlen($sUnindentTag);
+        $this->iIndentationLevel = 0;
+        $this->sResetColorSequence = $sResetColorSequence;
+        $this->sColorTagPrefix = $sColorTagPrefix;
+        $this->aRawColors = $aColors;
+        $this->buildColorTags();
     }
 
-    private function _buildColorTags ()
+    private function buildColorTags ()
     {
-        $this->_aColorsWithTag = array();
-        foreach ($this->_aRawColors as $sRawName => $sSequence) {
-            $sName = '{' . $this->_sColorTagPrefix . $sRawName . '}';
-            $this->_aColorsWithTag[$sName] = $sSequence;
+        $this->aColorsWithTag = array();
+        foreach ($this->aRawColors as $sRawName => $sSequence) {
+            $sName = '{' . $this->sColorTagPrefix . $sRawName . '}';
+            $this->aColorsWithTag[$sName] = $sSequence;
         }
+    }
+
+    private function processLeadingIndentationTags ($sMessage)
+    {
+        $bTagFound = true;
+        while ($bTagFound && strlen($sMessage) > 0) {
+            if (substr($sMessage, 0, $this->sIndentTagLength) == $this->sIndentTag) {
+                $this->iIndentationLevel++;
+                $sMessage = substr($sMessage, $this->sIndentTagLength);
+            } elseif (substr($sMessage, 0, $this->sUnindentTagLength) == $this->sUnindentTag) {
+                $this->iIndentationLevel = max(0, $this->iIndentationLevel-1);
+                $sMessage = substr($sMessage, $this->sUnindentTagLength);
+            } else {
+                $bTagFound = false;
+            }
+        }
+        return $sMessage;
+    }
+
+    private function processTrailingIndentationTags ($sMessage)
+    {
+        $bTagFound = true;
+        while ($bTagFound && strlen($sMessage) > 0) {
+            if (substr($sMessage, -$this->sIndentTagLength) == $this->sIndentTag) {
+                $this->iIndentationLevel++;
+                $sMessage = substr($sMessage, 0, -$this->sIndentTagLength);
+            } elseif (substr($sMessage, -$this->sUnindentTagLength) == $this->sUnindentTag) {
+                $this->iIndentationLevel = max(0, $this->iIndentationLevel-1);
+                $sMessage = substr($sMessage, 0, -$this->sUnindentTagLength);
+            } else {
+                $bTagFound = false;
+            }
+        }
+        return $sMessage;
     }
 
     /**
@@ -75,64 +109,37 @@ class ColoredIndentedLogger extends AbstractLogger
      * @param string $sColor
      * @return ColoredIndentedLogger_Interface $this
      */
-    public function log ($sMsgLevel, $sMessage, array $aContext=array())
+    public function log ($sMsgLevel, $sMessage, array $aContext = array())
     {
-        $this->_checkMsgLevel($sMsgLevel);
-        if (self::$_aIntLevels[$sMsgLevel] >= $this->_iMinMsgLevel) {
+        $this->checkMsgLevel($sMsgLevel);
+        if (self::$aIntLevels[$sMsgLevel] >= $this->iMinMsgLevel) {
+            $sMessage = $this->processLeadingIndentationTags($sMessage);
+            $iCurrIndentationLvl = $this->iIndentationLevel;
+            $sMessage = $this->processTrailingIndentationTags($sMessage);
 
-            $bTagFound = true;
-            while ($bTagFound) {
-                if (substr($sMessage, 0, $this->_sIndentTagLength) == $this->_sIndentTag) {
-                    $this->_iIndentationLevel++;
-                    $sMessage = substr($sMessage, $this->_sIndentTagLength);
-                } else if (substr($sMessage, 0, $this->_sUnindentTagLength) == $this->_sUnindentTag) {
-                    $this->_iIndentationLevel = max(0, $this->_iIndentationLevel-1);
-                    $sMessage = substr($sMessage, $this->_sUnindentTagLength);
-                    if (strlen($sMessage) === 0) {
-                        return;
-                    }
+            if (strlen($sMessage) > 0) {
+                if (isset($this->aRawColors[$sMsgLevel]) || isset($aContext[$this->sColorTagPrefix . $sMsgLevel])) {
+                    $sImplicitColor = '{' . $this->sColorTagPrefix . $sMsgLevel . '}';
+                    $sMessage = $sImplicitColor . $sMessage;
                 } else {
-                    $bTagFound = false;
+                    $iNbColorTags = preg_match_all('/{C.[A-Za-z0-9_.]+}/', $sMessage, $aMatches);
+                    $sImplicitColor = '';
                 }
-            }
-
-            $iCurrIndentationLvl = $this->_iIndentationLevel;
-
-            $bTagFound = true;
-            while ($bTagFound) {
-                if (substr($sMessage, -$this->_sIndentTagLength) == $this->_sIndentTag) {
-                    $this->_iIndentationLevel++;
-                    $sMessage = substr($sMessage, 0, -$this->_sIndentTagLength);
-                } else if (substr($sMessage, -$this->_sUnindentTagLength) == $this->_sUnindentTag) {
-                    $this->_iIndentationLevel = max(0, $this->_iIndentationLevel-1);
-                    $sMessage = substr($sMessage, 0, -$this->_sUnindentTagLength);
-                } else {
-                    $bTagFound = false;
+                $sMessage = $this->interpolateContext($sMessage, $aContext);
+                $sIndent = str_repeat($this->sBaseIndentation, $iCurrIndentationLvl);
+                $sMessage = $sIndent . str_replace("\n", "\n$sIndent$sImplicitColor", $sMessage);
+                $sMessage = strtr($sMessage, $this->aColorsWithTag);
+                if ($sImplicitColor != ''
+                    || (
+                        $iNbColorTags > 0
+                        && preg_match_all('/{C.[A-Za-z0-9_.]+}/', $sMessage, $aMatches) < $iNbColorTags
+                    )
+                ) {
+                    $sMessage .= $this->sResetColorSequence;
                 }
-            }
 
-            if (isset($this->_aRawColors[$sMsgLevel]) || isset($aContext[$this->_sColorTagPrefix . $sMsgLevel])) {
-                $sImplicitColor = '{' . $this->_sColorTagPrefix . $sMsgLevel . '}';
-                $sMessage = $sImplicitColor . $sMessage;
-            } else {
-                $iNbColorTags = preg_match_all('/{C.[A-Za-z0-9_.]+}/', $sMessage, $aMatches);
-                $sImplicitColor = '';
+                echo $sMessage . PHP_EOL;
             }
-            $sMessage = $this->_interpolateContext($sMessage, $aContext);
-            $sIndent = str_repeat($this->_sBaseIndentation, $iCurrIndentationLvl);
-            $sMessage = $sIndent . str_replace("\n", "\n$sIndent$sImplicitColor", $sMessage);
-            $sMessage = strtr($sMessage, $this->_aColorsWithTag);
-            if (
-                $sImplicitColor != ''
-                || (
-                    $iNbColorTags > 0
-                    && preg_match_all('/{C.[A-Za-z0-9_.]+}/', $sMessage, $aMatches) < $iNbColorTags
-                )
-            ) {
-                $sMessage .= $this->_sResetColorSequence;
-            }
-
-            echo $sMessage . PHP_EOL;
         }
     }
 }
