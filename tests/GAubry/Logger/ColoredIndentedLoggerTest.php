@@ -162,7 +162,7 @@ class ColoredIndentedLoggerTest extends \PHPUnit_Framework_TestCase
      */
     public function testLog_WithIndent (array $aMessages, $sExpectedMessage)
     {
-        $oLogger = new ColoredIndentedLogger(array(), "  ", '+++', '---', LogLevel::DEBUG);
+        $oLogger = new ColoredIndentedLogger(array(), '  ', '+++', '---', LogLevel::DEBUG);
         $this->expectOutputString($sExpectedMessage);
         foreach ($aMessages as $sMessage) {
             $oLogger->log(LogLevel::INFO, $sMessage, array());
@@ -212,7 +212,7 @@ class ColoredIndentedLoggerTest extends \PHPUnit_Framework_TestCase
             'title' => '[WHITE]',
             'ok' => '[GREEN]',
         );
-        $oLogger = new ColoredIndentedLogger($aColors, "  ", '+++', '---', LogLevel::DEBUG, '[RESET]', 'C.');
+        $oLogger = new ColoredIndentedLogger($aColors, '  ', '+++', '---', LogLevel::DEBUG, '[RESET]', 'C.');
         $this->expectOutputString($sExpectedMessage . PHP_EOL);
         $oLogger->log($sLevelMsg, $sMessage, array());
     }
@@ -227,6 +227,11 @@ class ColoredIndentedLoggerTest extends \PHPUnit_Framework_TestCase
             array(LogLevel::INFO, 'result: {C.ok}OK', 'result: [GREEN]OK[RESET]'),
             array(LogLevel::INFO, '{C.title}result: {C.ok}OK', '[WHITE]result: [GREEN]OK[RESET]'),
             array(LogLevel::EMERGENCY, '{C.title}result: {C.ok}OK', '[RED][WHITE]result: [GREEN]OK[RESET]'),
+
+            array(LogLevel::INFO, "a\nb", "a\nb"),
+            array(LogLevel::INFO, "+++a\nb", "  a\n  b"),
+            array(LogLevel::EMERGENCY, "a\nb", "[RED]a\n[RED]b[RESET]"),
+            array(LogLevel::EMERGENCY, "+++a\nb", "  [RED]a\n  [RED]b[RESET]"),
         );
     }
 }

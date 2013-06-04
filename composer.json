@@ -1,21 +1,25 @@
 {
     "name":         "geoffroy-aubry/logger",
     "description":  "bla bla",
-    "keywords":     ["bla"],
+    "keywords":     ["logger", "color logging", "bash color logging"],
     "type":         "library",
     "license":      "LGPL-3.0+",
     "authors":      [
         {
             "name":     "Geoffroy Aubry",
-            "email":    "gaubry@hi-media.com"
+            "email":    "geoffroy.aubry@free.fr"
         }
     ],
     "require": {
         "php": ">=5.3.3",
-        "psr/log": "1.0.0"
+        "psr/log": "1.0.0",
+        "geoffroy-aubry/helpers": "1.*"
     },
     "require-dev": {
-        "geoffroy-aubry/debug": "1.0.*"
+        "phpunit/phpunit":           ">=3.7",
+        "phpmd/phpmd":               "1.4.*",
+        "squizlabs/php_codesniffer": "1.4.*",
+        "satooshi/php-coveralls":    "dev-master"
     },
     "autoload": {
         "psr-0": {"GAubry\\Logger": "src/"}
