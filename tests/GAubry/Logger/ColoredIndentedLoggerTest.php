@@ -79,19 +79,25 @@ class ColoredIndentedLoggerTest extends \PHPUnit_Framework_TestCase
      */
     public function dataProviderTestLogMinMsgLevel ()
     {
-        return array(
-            array(LogLevel::DEBUG, LogLevel::DEBUG, 'Message', 'Message'),
-            array(LogLevel::DEBUG, LogLevel::ERROR, 'Message', 'Message'),
-            array(LogLevel::DEBUG, LogLevel::EMERGENCY, 'Message', 'Message'),
-
-            array(LogLevel::ERROR, LogLevel::DEBUG, 'Message', ''),
-            array(LogLevel::ERROR, LogLevel::ERROR, 'Message', 'Message'),
-            array(LogLevel::ERROR, LogLevel::EMERGENCY, 'Message', 'Message'),
-
-            array(LogLevel::EMERGENCY, LogLevel::DEBUG, 'Message', ''),
-            array(LogLevel::EMERGENCY, LogLevel::ERROR, 'Message', ''),
-            array(LogLevel::EMERGENCY, LogLevel::EMERGENCY, 'Message', 'Message'),
+        $aLevels = array(
+            LogLevel::DEBUG,
+            LogLevel::INFO,
+            LogLevel::NOTICE,
+            LogLevel::WARNING,
+            LogLevel::ERROR,
+            LogLevel::CRITICAL,
+            LogLevel::ALERT,
+            LogLevel::EMERGENCY
         );
+
+        $aTests = array();
+        foreach ($aLevels as $idxMin => $iMinMsgLevel) {
+            foreach ($aLevels as $idx => $iMsgLevel) {
+                $sExpectedMsg = ($idxMin > $idx ? '' : 'Message');
+                $aTests[] = array($iMinMsgLevel, $iMsgLevel, 'Message', $sExpectedMsg);
+            }
+        }
+        return $aTests;
     }
 
     /**
