@@ -9,7 +9,7 @@
     convertWarningsToExceptions="true"
     syntaxCheck="true"
     processIsolation="false"
-    colors="true"
+    colors="false"
     strict="true"
     verbose="true"
     stopOnFailure="false"
