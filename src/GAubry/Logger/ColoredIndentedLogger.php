@@ -33,6 +33,7 @@ class ColoredIndentedLogger extends AbstractLogger
      * Constructeur.
      *
      * @param string $iMinMsgLevel Seuil d'importance à partir duquel accepter de loguer un message.
+     * @throws \Psr\Log\InvalidArgumentException if calling this method with a level not defined in \Psr\Log\LogLevel
      * @see \Psr\Log\LogLevel
      */
     public function __construct (
@@ -108,6 +109,7 @@ class ColoredIndentedLogger extends AbstractLogger
      * @param array $context
      * @param string $sColor
      * @return ColoredIndentedLogger_Interface $this
+     * @throws \Psr\Log\InvalidArgumentException if calling this method with a level not defined in \Psr\Log\LogLevel
      */
     public function log ($sMsgLevel, $sMessage, array $aContext = array())
     {

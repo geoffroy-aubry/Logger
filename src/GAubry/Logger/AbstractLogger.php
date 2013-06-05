@@ -3,6 +3,7 @@
 namespace GAubry\Logger;
 
 use \Psr\Log\LogLevel;
+use \Psr\Log\InvalidArgumentException;
 
 abstract class AbstractLogger extends \Psr\Log\AbstractLogger
 {
@@ -27,6 +28,7 @@ abstract class AbstractLogger extends \Psr\Log\AbstractLogger
      * Constructeur.
      *
      * @param string $iMinMsgLevel Seuil d'importance à partir duquel accepter de loguer un message.
+     * @throws \Psr\Log\InvalidArgumentException if calling this method with a level not defined in \Psr\Log\LogLevel
      * @see \Psr\Log\LogLevel
     */
     protected function __construct ($sMinMsgLevel = LogLevel::DEBUG)
@@ -35,16 +37,23 @@ abstract class AbstractLogger extends \Psr\Log\AbstractLogger
         $this->iMinMsgLevel = self::$aIntLevels[$sMinMsgLevel];
     }
 
+    /**
+     *
+     *
+     * @param unknown $sMsgLevel
+     * @throws \Psr\Log\InvalidArgumentException if calling this method with a level not defined in \Psr\Log\LogLevel
+     */
     protected function checkMsgLevel ($sMsgLevel)
     {
         if (! isset(self::$aIntLevels[$sMsgLevel])) {
             $sErrorMsg = "Unkown level: '$sMsgLevel'! Level MUST be defined in \Psr\Log\LogLevel class.";
-            throw new \InvalidArgumentException($sErrorMsg, 1);
+            throw new InvalidArgumentException($sErrorMsg, 1);
         }
     }
 
     /**
      * Interpolates context values into the message placeholders.
+     * Taken from PSR-3's example implementation.
      */
     protected function interpolateContext ($sMessage, array $aContext)
     {

@@ -25,14 +25,12 @@ class ColoredIndentedLoggerTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @covers \GAubry\Logger\AbstractLogger::__construct
-     * @covers \GAubry\Logger\AbstractLogger::checkMsgLevel
      * @covers \GAubry\Logger\ColoredIndentedLogger::__construct
      */
     public function testConstructThrowExceptionWhenBadMinMsgLevel ()
     {
         $this->setExpectedException(
-            'InvalidArgumentException',
+            '\Psr\Log\InvalidArgumentException',
             "Unkown level: 'xyz'! Level MUST be defined in \Psr\Log\LogLevel class."
         );
         $oLogger = new ColoredIndentedLogger(array(), ' ', '+', '-', 'xyz');
@@ -40,13 +38,12 @@ class ColoredIndentedLoggerTest extends \PHPUnit_Framework_TestCase
 
 
     /**
-     * @covers \GAubry\Logger\AbstractLogger::checkMsgLevel
      * @covers \GAubry\Logger\ColoredIndentedLogger::log
      */
     public function testLogThrowExceptionWhenBadMinMsgLevel ()
     {
         $this->setExpectedException(
-            'InvalidArgumentException',
+            '\Psr\Log\InvalidArgumentException',
             "Unkown level: 'xyz'! Level MUST be defined in \Psr\Log\LogLevel class."
         );
         $oLogger = new ColoredIndentedLogger(array(), ' ', '+', '-', LogLevel::DEBUG);
@@ -54,7 +51,6 @@ class ColoredIndentedLoggerTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @covers \GAubry\Logger\AbstractLogger::__construct
      * @covers \GAubry\Logger\ColoredIndentedLogger::__construct
      * @covers \GAubry\Logger\ColoredIndentedLogger::log
      * @dataProvider dataProviderTestLogMinMsgLevel
@@ -144,7 +140,6 @@ class ColoredIndentedLoggerTest extends \PHPUnit_Framework_TestCase
 
     /**
      * @covers \GAubry\Logger\ColoredIndentedLogger::log
-     * @covers \GAubry\Logger\AbstractLogger::interpolateContext
      * @dataProvider dataProviderTestLogWithContext
      *
      * @param string $sMessage

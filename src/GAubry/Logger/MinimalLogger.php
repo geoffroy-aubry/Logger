@@ -10,6 +10,7 @@ class MinimalLogger extends AbstractLogger
      * Constructeur.
      *
      * @param string $iMinMsgLevel Seuil d'importance à partir duquel accepter de loguer un message.
+     * @throws \Psr\Log\InvalidArgumentException if calling this method with a level not defined in \Psr\Log\LogLevel
      * @see \Psr\Log\LogLevel
      */
     public function __construct ($sMinMsgLevel = LogLevel::DEBUG)
@@ -24,6 +25,7 @@ class MinimalLogger extends AbstractLogger
      * @param string $message
      * @param array $context
      * @return null
+     * @throws \Psr\Log\InvalidArgumentException if calling this method with a level not defined in \Psr\Log\LogLevel
      */
     public function log ($sMsgLevel, $sMessage, array $aContext = array())
     {
