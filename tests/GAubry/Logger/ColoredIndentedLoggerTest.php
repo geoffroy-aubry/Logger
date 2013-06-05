@@ -13,7 +13,6 @@ class ColoredIndentedLoggerTest extends \PHPUnit_Framework_TestCase
      */
     public function setUp ()
     {
-
     }
 
     /**
@@ -33,7 +32,7 @@ class ColoredIndentedLoggerTest extends \PHPUnit_Framework_TestCase
             '\Psr\Log\InvalidArgumentException',
             "Unkown level: 'xyz'! Level MUST be defined in \Psr\Log\LogLevel class."
         );
-        $oLogger = new ColoredIndentedLogger(array(), ' ', '+', '-', 'xyz');
+        $oLogger = new ColoredIndentedLogger(array('min_message_level' => 'xyz'));
     }
 
 
@@ -46,7 +45,7 @@ class ColoredIndentedLoggerTest extends \PHPUnit_Framework_TestCase
             '\Psr\Log\InvalidArgumentException',
             "Unkown level: 'xyz'! Level MUST be defined in \Psr\Log\LogLevel class."
         );
-        $oLogger = new ColoredIndentedLogger(array(), ' ', '+', '-', LogLevel::DEBUG);
+        $oLogger = new ColoredIndentedLogger(array());
         $oLogger->log('xyz', 'Message');
     }
 
@@ -62,9 +61,9 @@ class ColoredIndentedLoggerTest extends \PHPUnit_Framework_TestCase
      */
     public function testLogMinMsgLevel ($sMinMsgLevel, $sLevel, $sMessage, $sExpectedMessage)
     {
-        $oLogger = new ColoredIndentedLogger(array(), ' ', '+', '-', $sMinMsgLevel);
+        $oLogger = new ColoredIndentedLogger(array('min_message_level' => $sMinMsgLevel));
         $sExpectedResult = $sExpectedMessage . (strlen($sExpectedMessage) > 0 ? PHP_EOL : '');
-        $this->expectOutputString(str_replace('\033', "\033", $sExpectedResult));
+        $this->expectOutputString($sExpectedResult);
         $oLogger->log($sLevel, $sMessage);
     }
 
@@ -191,7 +190,12 @@ class ColoredIndentedLoggerTest extends \PHPUnit_Framework_TestCase
      */
     public function testLogWithIndent (array $aMessages, $sExpectedMessage)
     {
-        $oLogger = new ColoredIndentedLogger(array(), '  ', '+++', '---', LogLevel::DEBUG);
+        $aConfig = array(
+            'base_indentation'     => '  ',
+            'indent_tag'           => '+++',
+            'unindent_tag'         => '---'
+        );
+        $oLogger = new ColoredIndentedLogger($aConfig);
         $this->expectOutputString($sExpectedMessage);
         foreach ($aMessages as $sMessage) {
             $oLogger->log(LogLevel::INFO, $sMessage, array());
@@ -248,12 +252,18 @@ class ColoredIndentedLoggerTest extends \PHPUnit_Framework_TestCase
      */
     public function testLogWithColor ($sLevelMsg, $sMessage, $sExpectedMessage)
     {
-        $aColors = array(
-            'emergency' => '[RED]',
-            'title' => '[WHITE]',
-            'ok' => '[GREEN]',
+        $aConfig = array(
+            'colors' => array(
+                'emergency' => '[RED]',
+                'title' => '[WHITE]',
+                'ok' => '[GREEN]',
+            ),
+            'base_indentation'     => '  ',
+            'indent_tag'           => '+++',
+            'unindent_tag'         => '---',
+            'reset_color_sequence' => '[RESET]',
         );
-        $oLogger = new ColoredIndentedLogger($aColors, '  ', '+++', '---', LogLevel::DEBUG, '[RESET]', 'C.');
+        $oLogger = new ColoredIndentedLogger($aConfig);
         if (strlen($sExpectedMessage) > 0) {
             $sExpectedMessage .= PHP_EOL;
         }

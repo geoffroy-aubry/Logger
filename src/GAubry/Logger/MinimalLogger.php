@@ -2,16 +2,23 @@
 
 namespace GAubry\Logger;
 
-use \Psr\Log\LogLevel;
+use Psr\Log\LogLevel;
 
+/**
+ * This Logger can be used to avoid both indentation and insertion of bash color codes into log messages.
+ *
+ * Logging should always be optional, and if no logger is provided to your
+ * library creating a \Psr\Log\NullLogger instance in order to avoid conditional log calls.
+ *
+ * @author Geoffroy AUBRY <geoffroy.aubry@free.fr>
+ */
 class MinimalLogger extends AbstractLogger
 {
     /**
-     * Constructeur.
+     * Constructor.
      *
-     * @param string $iMinMsgLevel Seuil d'importance à partir duquel accepter de loguer un message.
+     * @param string $iMinMsgLevel threshold required to log message, must be defined in \Psr\Log\LogLevel
      * @throws \Psr\Log\InvalidArgumentException if calling this method with a level not defined in \Psr\Log\LogLevel
-     * @see \Psr\Log\LogLevel
      */
     public function __construct ($sMinMsgLevel = LogLevel::DEBUG)
     {
@@ -21,10 +28,9 @@ class MinimalLogger extends AbstractLogger
     /**
      * Logs with an arbitrary level.
      *
-     * @param mixed $level
-     * @param string $message
-     * @param array $context
-     * @return null
+     * @param string $sMsgLevel message level, must be defined in \Psr\Log\LogLevel
+     * @param string $sMessage message with placeholders
+     * @param array $aContext context array
      * @throws \Psr\Log\InvalidArgumentException if calling this method with a level not defined in \Psr\Log\LogLevel
      */
     public function log ($sMsgLevel, $sMessage, array $aContext = array())

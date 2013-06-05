@@ -2,81 +2,128 @@
 
 namespace GAubry\Logger;
 
-use \Psr\Log\LogLevel;
+use GAubry\Helpers\Helpers;
+use Psr\Log\LogLevel;
 
+/**
+ *
+ * @author Geoffroy AUBRY <geoffroy.aubry@free.fr>
+ */
 class ColoredIndentedLogger extends AbstractLogger
 {
-    private $aRawColors;
-    private $aColorsWithTag;
-
     /**
-     * Valeur d'un niveau d'indentation.
-     * @var string
+     * Length of the indent tag.
+     * @var int
+     * @see 'indent_tag' key of ColoredIndentedLogger::$aDefaultConfig
      */
-    private $sBaseIndentation;
-
-    private $sIndentTag;
-    private $sUnindentTag;
-    private $sIndentTagLength;
-    private $sUnindentTagLength;
-
-    private $sResetColorSequence;
-    private $sColorTagPrefix;
+    private $iIndentTagLength;
 
     /**
-     * Niveau de l'indentation courante (commence à 0).
+     * Length of the unindent tag.
+     * @var int
+     * @see 'unindent_tag' key of ColoredIndentedLogger::$aDefaultConfig
+     */
+    private $iUnindentTagLength;
+
+    /**
+     * Current zero-based indentation level.
      * @var int
      */
     private $iIndentationLevel;
 
     /**
-     * Constructeur.
-     *
-     * @param string $iMinMsgLevel Seuil d'importance à partir duquel accepter de loguer un message.
-     * @throws \Psr\Log\InvalidArgumentException if calling this method with a level not defined in \Psr\Log\LogLevel
-     * @see \Psr\Log\LogLevel
+     * Full length color tags combining prefix to user define colors.
+     * @var array
+     * @see ColoredIndentedLogger::buildColorTags()
+     * @see 'color_tag_prefix' key of ColoredIndentedLogger::$aDefaultConfig
      */
-    public function __construct (
-        array $aColors,
-        $sBaseIndentation,
-        $sIndentTag = '+++',
-        $sUnindentTag = '---',
-        $sMinMsgLevel = LogLevel::DEBUG,
-        $sResetColorSequence = "\033[0m",
-        $sColorTagPrefix = 'C.'
-    ) {
-        parent::__construct($sMinMsgLevel);
-        $this->sBaseIndentation = $sBaseIndentation;
-        $this->sIndentTag = $sIndentTag;
-        $this->sIndentTagLength = strlen($sIndentTag);
-        $this->sUnindentTag = $sUnindentTag;
-        $this->sUnindentTagLength = strlen($sUnindentTag);
+    private $aColorTags;
+
+    /**
+     * Default configuration.
+     *   – 'colors'               => (array) Array of key/value pairs to associate bash color codes to color tags.
+     *                                       Example: array(
+     *                                           'debug'   => "\033[0;30m",
+     *                                           'warning' => "\033[0;33m",
+     *                                           'error'   => "\033[1;31m"
+     *                                       )
+     *   – 'base_indentation'     => (string) Describe what is a simple indentation, e.g. "\t".
+     *   – 'indent_tag'           => (string) Tag usable at the start or at the end of the message to add
+     *                                        one or more indentation level.
+     *   – 'unindent_tag'         => (string) Tag usable at the start or at the end of the message to remove
+     *                                        one or more indentation level.
+     *   – 'min_message_level'    => (string) Threshold required to log message, must be defined in \Psr\Log\LogLevel.
+     *   – 'reset_color_sequence' => (string) Concatenated sequence at the end of message when colors are used.
+     *   – 'color_tag_prefix'     => (string) Prefix used in placeholders to distinguish standard context from colors.
+     *
+     * @var array
+     */
+    private static $aDefaultConfig = array(
+        'colors'               => array(),
+        'base_indentation'     => "\033[0;30m┆\033[0m   ",
+        'indent_tag'           => '+++',
+        'unindent_tag'         => '---',
+        'min_message_level'    => LogLevel::DEBUG,
+        'reset_color_sequence' => "\033[0m",
+        'color_tag_prefix'     => 'C.'
+    );
+
+    /**
+     * Current configuration.
+     * @var array
+     * @see ColoredIndentedLogger::$aDefaultConfig
+     */
+    private $aConfig;
+
+    /**
+     * Constructor.
+     *
+     * @param array $aConfig see self::$aDefaultConfig
+     * @throws \Psr\Log\InvalidArgumentException if calling this method with a level not defined in \Psr\Log\LogLevel
+     */
+    public function __construct (array $aConfig = array())
+    {
+        $this->aConfig = Helpers::arrayMergeRecursiveDistinct(self::$aDefaultConfig, $aConfig);
+        parent::__construct($this->aConfig['min_message_level']);
+
+        $this->iIndentTagLength = strlen($this->aConfig['indent_tag']);
+        $this->iUnindentTagLength = strlen($this->aConfig['unindent_tag']);
         $this->iIndentationLevel = 0;
-        $this->sResetColorSequence = $sResetColorSequence;
-        $this->sColorTagPrefix = $sColorTagPrefix;
-        $this->aRawColors = $aColors;
         $this->buildColorTags();
     }
 
+    /**
+     * Build full length color tags by adding prefix to user define colors.
+     * @see ColoredIndentedLogger::aColorTags
+     * @see 'color_tag_prefix' key of ColoredIndentedLogger::$aDefaultConfig
+     */
     private function buildColorTags ()
     {
-        $this->aColorsWithTag = array();
-        foreach ($this->aRawColors as $sRawName => $sSequence) {
-            $sName = '{' . $this->sColorTagPrefix . $sRawName . '}';
-            $this->aColorsWithTag[$sName] = $sSequence;
+        $this->aColorTags = array();
+        foreach ($this->aConfig['colors'] as $sRawName => $sSequence) {
+            $sName = '{' . $this->aConfig['color_tag_prefix'] . $sRawName . '}';
+            $this->aColorTags[$sName] = $sSequence;
         }
     }
 
+    /**
+     * Update indentation level according to leading indentation tags
+     * and remove them from the returned string.
+     *
+     * @param string $sMessage
+     * @return string specified message without any leading indentation tag
+     * @see ColoredIndentedLogger::iIndentationLevel
+     */
     private function processLeadingIndentationTags ($sMessage)
     {
         $bTagFound = true;
         while ($bTagFound && strlen($sMessage) > 0) {
-            if (substr($sMessage, 0, $this->sIndentTagLength) == $this->sIndentTag) {
+            if (substr($sMessage, 0, $this->iIndentTagLength) == $this->aConfig['indent_tag']) {
                 $this->iIndentationLevel++;
-                $sMessage = substr($sMessage, $this->sIndentTagLength);
-            } elseif (substr($sMessage, 0, $this->sUnindentTagLength) == $this->sUnindentTag) {
+                $sMessage = substr($sMessage, $this->iIndentTagLength);
+            } elseif (substr($sMessage, 0, $this->iUnindentTagLength) == $this->aConfig['unindent_tag']) {
                 $this->iIndentationLevel = max(0, $this->iIndentationLevel-1);
-                $sMessage = substr($sMessage, $this->sUnindentTagLength);
+                $sMessage = substr($sMessage, $this->iUnindentTagLength);
             } else {
                 $bTagFound = false;
             }
@@ -84,16 +131,24 @@ class ColoredIndentedLogger extends AbstractLogger
         return $sMessage;
     }
 
+    /**
+     * Update indentation level according to trailing indentation tags
+     * and remove them from the returned string.
+     *
+     * @param string $sMessage
+     * @return string specified message without any trailing indentation tag
+     * @see ColoredIndentedLogger::iIndentationLevel
+     */
     private function processTrailingIndentationTags ($sMessage)
     {
         $bTagFound = true;
         while ($bTagFound && strlen($sMessage) > 0) {
-            if (substr($sMessage, -$this->sIndentTagLength) == $this->sIndentTag) {
+            if (substr($sMessage, -$this->iIndentTagLength) == $this->aConfig['indent_tag']) {
                 $this->iIndentationLevel++;
-                $sMessage = substr($sMessage, 0, -$this->sIndentTagLength);
-            } elseif (substr($sMessage, -$this->sUnindentTagLength) == $this->sUnindentTag) {
+                $sMessage = substr($sMessage, 0, -$this->iIndentTagLength);
+            } elseif (substr($sMessage, -$this->iUnindentTagLength) == $this->aConfig['unindent_tag']) {
                 $this->iIndentationLevel = max(0, $this->iIndentationLevel-1);
-                $sMessage = substr($sMessage, 0, -$this->sUnindentTagLength);
+                $sMessage = substr($sMessage, 0, -$this->iUnindentTagLength);
             } else {
                 $bTagFound = false;
             }
@@ -104,11 +159,14 @@ class ColoredIndentedLogger extends AbstractLogger
     /**
      * Logs with an arbitrary level.
      *
-     * @param mixed $level
-     * @param string $sMessage
-     * @param array $context
-     * @param string $sColor
-     * @return ColoredIndentedLogger_Interface $this
+     * Allows adjustment of the indentation whith multiple leading or trailing tags:
+     * see $this->sIndentTag and $this->sUnindentTag
+     *
+     * Allows insertion of bash colors via placeholders and context array.
+     *
+     * @param mixed $sMsgLevel message level, must be defined in \Psr\Log\LogLevel
+     * @param string $sMessage message with placeholders
+     * @param array $aContext context array
      * @throws \Psr\Log\InvalidArgumentException if calling this method with a level not defined in \Psr\Log\LogLevel
      */
     public function log ($sMsgLevel, $sMessage, array $aContext = array())
@@ -120,24 +178,26 @@ class ColoredIndentedLogger extends AbstractLogger
             $sMessage = $this->processTrailingIndentationTags($sMessage);
 
             if (strlen($sMessage) > 0) {
-                if (isset($this->aRawColors[$sMsgLevel]) || isset($aContext[$this->sColorTagPrefix . $sMsgLevel])) {
-                    $sImplicitColor = '{' . $this->sColorTagPrefix . $sMsgLevel . '}';
+                if (isset($this->aConfig['colors'][$sMsgLevel])
+                    || isset($aContext[$this->aConfig['color_tag_prefix'] . $sMsgLevel])
+                ) {
+                    $sImplicitColor = '{' . $this->aConfig['color_tag_prefix'] . $sMsgLevel . '}';
                     $sMessage = $sImplicitColor . $sMessage;
                 } else {
                     $iNbColorTags = preg_match_all('/{C.[A-Za-z0-9_.]+}/', $sMessage, $aMatches);
                     $sImplicitColor = '';
                 }
                 $sMessage = $this->interpolateContext($sMessage, $aContext);
-                $sIndent = str_repeat($this->sBaseIndentation, $iCurrIndentationLvl);
+                $sIndent = str_repeat($this->aConfig['base_indentation'], $iCurrIndentationLvl);
                 $sMessage = $sIndent . str_replace("\n", "\n$sIndent$sImplicitColor", $sMessage);
-                $sMessage = strtr($sMessage, $this->aColorsWithTag);
+                $sMessage = strtr($sMessage, $this->aColorTags);
                 if ($sImplicitColor != ''
                     || (
                         $iNbColorTags > 0
                         && preg_match_all('/{C.[A-Za-z0-9_.]+}/', $sMessage, $aMatches) < $iNbColorTags
                     )
                 ) {
-                    $sMessage .= $this->sResetColorSequence;
+                    $sMessage .= $this->aConfig['reset_color_sequence'];
                 }
 
                 echo $sMessage . PHP_EOL;
