@@ -2,7 +2,7 @@
 
 namespace GAubry\Logger\Tests;
 
-use \Psr\Log\LogLevel;
+use Psr\Log\LogLevel;
 
 class AbstractLoggerTest extends \PHPUnit_Framework_TestCase
 {

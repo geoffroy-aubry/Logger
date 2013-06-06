@@ -2,8 +2,8 @@
 
 namespace GAubry\Logger\Tests;
 
-use \GAubry\Logger\MinimalLogger;
-use \Psr\Log\LogLevel;
+use GAubry\Logger\MinimalLogger;
+use Psr\Log\LogLevel;
 
 class MinimalLoggerTest extends \PHPUnit_Framework_TestCase
 {

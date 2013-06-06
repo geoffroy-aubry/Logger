@@ -54,6 +54,7 @@ class ColoredIndentedLogger extends AbstractLogger
      *                                        one or more indentation level.
      *   – 'min_message_level'    => (string) Threshold required to log message, must be defined in \Psr\Log\LogLevel.
      *   – 'reset_color_sequence' => (string) Concatenated sequence at the end of message when colors are used.
+     *                                        For example: "\033[0m".
      *   – 'color_tag_prefix'     => (string) Prefix used in placeholders to distinguish standard context from colors.
      *
      * @var array

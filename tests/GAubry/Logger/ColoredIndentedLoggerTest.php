@@ -2,8 +2,8 @@
 
 namespace GAubry\Logger\Tests;
 
-use \GAubry\Logger\ColoredIndentedLogger;
-use \Psr\Log\LogLevel;
+use GAubry\Logger\ColoredIndentedLogger;
+use Psr\Log\LogLevel;
 
 class ColoredIndentedLoggerTest extends \PHPUnit_Framework_TestCase
 {
