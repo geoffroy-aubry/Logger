@@ -40,6 +40,8 @@ It is even possible to specify color tag in the value of a placeholder:
     $oLogger->info('Result is {result}', array('result' => '{C.ok}OK'));
 ```
 
+*See below for demonstration.*
+
 ### Indentation
 You can control indentation level with indent and unindent tags:
 
@@ -55,8 +57,9 @@ $oLogger->info('Subsection+++');
 $oLogger->info('Step 1');
 $oLogger->info('Step 2');
 $oLogger->info('------Section B+++');
-…
 ```
+
+*See below for demonstration.*
 
 ### Configuration
 Default configuration:
@@ -66,7 +69,7 @@ array(
     'base_indentation'     => "\033[0;30m┆\033[0m   ",
     'indent_tag'           => '+++',
     'unindent_tag'         => '---',
-    'min_message_level'    => LogLevel::DEBUG,
+    'min_message_level'    => \Psr\Log\LogLevel::DEBUG,
     'reset_color_sequence' => "\033[0m",
     'color_tag_prefix'     => 'C.'
 );
@@ -84,7 +87,12 @@ Where:
 
 ### Demo
 
-See [demo.php](examples/demo.php) script for an example. Here is the result:
+See [demo.php](examples/demo.php) script for an example:
+```bash
+$ php examples/demo.php
+```
+
+Here is the result:
 
 ![result of demo.php](examples/demo.png)
 
