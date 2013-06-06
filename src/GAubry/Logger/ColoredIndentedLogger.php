@@ -6,12 +6,18 @@ use GAubry\Helpers\Helpers;
 use Psr\Log\LogLevel;
 
 /**
+ * PSR-3 logger for adding colors and indentation on PHP CLI output.
+ *
+ * Use tags and placeholder syntax to provide an easy way to color and indent PHP CLI output.
+ * PSR-3 compatibility allows graceful degradation when switching to another PSR-3 compliant logger.
+ * See README.md for more information.
  *
  * Copyright (c) 2013 Geoffroy Aubry <geoffroy.aubry@free.fr>
  * Licensed under the GNU Lesser General Public License v3 (LGPL version 3).
  *
  * @copyright 2013 Geoffroy Aubry <geoffroy.aubry@free.fr>
  * @license http://www.gnu.org/licenses/lgpl.html
+ * @see https://github.com/php-fig/fig-standards/blob/master/accepted/PSR-3-logger-interface.md
  */
 class ColoredIndentedLogger extends AbstractLogger
 {

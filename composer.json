@@ -1,7 +1,7 @@
 {
     "name":         "geoffroy-aubry/logger",
-    "description":  "bla bla",
-    "keywords":     ["logger", "color logging", "bash color logging"],
+    "description":  "PSR-3 logger for adding colors and indentation on PHP CLI output.",
+    "keywords":     ["logger", "color logging", "bash color logging", "indent logging", "PSR-3"],
     "type":         "library",
     "license":      "LGPL-3.0+",
     "authors":      [
