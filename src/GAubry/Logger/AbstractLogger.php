@@ -6,10 +6,14 @@ use Psr\Log\LogLevel;
 use Psr\Log\InvalidArgumentException;
 
 /**
- * This is a simple Logger implementation that other Loggers can inherit from.
+ * This is a simple abstract Logger implementation that other Loggers can inherit from.
+ *
+ * Copyright (c) 2013 Geoffroy Aubry <geoffroy.aubry@free.fr>
+ * Licensed under the GNU Lesser General Public License v3 (LGPL version 3).
  *
  * @see https://github.com/php-fig/fig-standards/blob/master/accepted/PSR-3-logger-interface.md
- * @author Geoffroy AUBRY <geoffroy.aubry@free.fr>
+ * @copyright 2013 Geoffroy Aubry <geoffroy.aubry@free.fr>
+ * @license http://www.gnu.org/licenses/lgpl.html
  */
 abstract class AbstractLogger extends \Psr\Log\AbstractLogger
 {

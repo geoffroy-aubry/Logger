@@ -7,7 +7,11 @@ use Psr\Log\LogLevel;
 
 /**
  *
- * @author Geoffroy AUBRY <geoffroy.aubry@free.fr>
+ * Copyright (c) 2013 Geoffroy Aubry <geoffroy.aubry@free.fr>
+ * Licensed under the GNU Lesser General Public License v3 (LGPL version 3).
+ *
+ * @copyright 2013 Geoffroy Aubry <geoffroy.aubry@free.fr>
+ * @license http://www.gnu.org/licenses/lgpl.html
  */
 class ColoredIndentedLogger extends AbstractLogger
 {
