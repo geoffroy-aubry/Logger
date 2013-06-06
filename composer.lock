@@ -3,20 +3,20 @@
         "This file locks the dependencies of your project to a known state",
         "Read more about it at http://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file"
     ],
-    "hash": "1ed8dde6c477dee0c471874df483a6f0",
+    "hash": "cc7acde854c36e33f34dffc157828240",
     "packages": [
         {
             "name": "geoffroy-aubry/helpers",
-            "version": "v1.2.0",
+            "version": "v1.2.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/geoffroy-aubry/Helpers.git",
-                "reference": "v1.2.0"
+                "reference": "v1.2.1"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/geoffroy-aubry/Helpers/zipball/v1.2.0",
-                "reference": "v1.2.0",
+                "url": "https://api.github.com/repos/geoffroy-aubry/Helpers/zipball/v1.2.1",
+                "reference": "v1.2.1",
                 "shasum": ""
             },
             "require": {
@@ -49,7 +49,7 @@
                 "helpers",
                 "tools"
             ],
-            "time": "2013-06-03 21:20:49"
+            "time": "2013-06-05 21:53:30"
         },
         {
             "name": "psr/log",
@@ -936,17 +936,17 @@
         },
         {
             "name": "symfony/stopwatch",
-            "version": "v2.2.1",
+            "version": "v2.3.0",
             "target-dir": "Symfony/Component/Stopwatch",
             "source": {
                 "type": "git",
                 "url": "https://github.com/symfony/Stopwatch.git",
-                "reference": "v2.2.1"
+                "reference": "v2.3.0-RC1"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/symfony/Stopwatch/zipball/v2.2.1",
-                "reference": "v2.2.1",
+                "url": "https://api.github.com/repos/symfony/Stopwatch/zipball/v2.3.0-RC1",
+                "reference": "v2.3.0-RC1",
                 "shasum": ""
             },
             "require": {
@@ -955,7 +955,7 @@
             "type": "library",
             "extra": {
                 "branch-alias": {
-                    "dev-master": "2.2-dev"
+                    "dev-master": "2.3-dev"
                 }
             },
             "autoload": {
@@ -979,21 +979,21 @@
             ],
             "description": "Symfony Stopwatch Component",
             "homepage": "http://symfony.com",
-            "time": "2013-01-04 16:58:00"
+            "time": "2013-04-17 07:17:10"
         },
         {
             "name": "symfony/yaml",
-            "version": "v2.2.2",
+            "version": "v2.3.0",
             "target-dir": "Symfony/Component/Yaml",
             "source": {
                 "type": "git",
                 "url": "https://github.com/symfony/Yaml.git",
-                "reference": "v2.2.2"
+                "reference": "v2.3.0-RC1"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/symfony/Yaml/zipball/v2.2.2",
-                "reference": "v2.2.2",
+                "url": "https://api.github.com/repos/symfony/Yaml/zipball/v2.3.0-RC1",
+                "reference": "v2.3.0-RC1",
                 "shasum": ""
             },
             "require": {
@@ -1002,7 +1002,7 @@
             "type": "library",
             "extra": {
                 "branch-alias": {
-                    "dev-master": "2.2-dev"
+                    "dev-master": "2.3-dev"
                 }
             },
             "autoload": {
@@ -1026,7 +1026,7 @@
             ],
             "description": "Symfony Yaml Component",
             "homepage": "http://symfony.com",
-            "time": "2013-05-10 18:08:31"
+            "time": "2013-05-10 18:12:13"
         }
     ],
     "aliases": [
