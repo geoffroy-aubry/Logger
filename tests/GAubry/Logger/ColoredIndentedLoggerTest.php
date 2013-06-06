@@ -2,8 +2,8 @@
 
 namespace GAubry\Logger\Tests;
 
-use \GAubry\Logger\ColoredIndentedLogger;
-use \Psr\Log\LogLevel;
+use GAubry\Logger\ColoredIndentedLogger;
+use Psr\Log\LogLevel;
 
 class ColoredIndentedLoggerTest extends \PHPUnit_Framework_TestCase
 {
@@ -13,7 +13,6 @@ class ColoredIndentedLoggerTest extends \PHPUnit_Framework_TestCase
      */
     public function setUp ()
     {
-
     }
 
     /**
@@ -25,71 +24,84 @@ class ColoredIndentedLoggerTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @covers \GAubry\Logger\AbstractLogger::__construct
-     * @covers \GAubry\Logger\AbstractLogger::_checkMsgLevel
      * @covers \GAubry\Logger\ColoredIndentedLogger::__construct
      */
-    public function testConstruct_ThrowExceptionWhenBadMinMsgLevel ()
+    public function testConstructThrowExceptionWhenBadMinMsgLevel ()
     {
         $this->setExpectedException(
-            'InvalidArgumentException',
+            '\Psr\Log\InvalidArgumentException',
             "Unkown level: 'xyz'! Level MUST be defined in \Psr\Log\LogLevel class."
         );
-        $oLogger = new ColoredIndentedLogger(array(), ' ', '+', '-', 'xyz');
+        $oLogger = new ColoredIndentedLogger(array('min_message_level' => 'xyz'));
     }
 
 
     /**
-     * @covers \GAubry\Logger\AbstractLogger::_checkMsgLevel
      * @covers \GAubry\Logger\ColoredIndentedLogger::log
      */
-    public function testLog_ThrowExceptionWhenBadMinMsgLevel ()
+    public function testLogThrowExceptionWhenBadMinMsgLevel ()
     {
         $this->setExpectedException(
-            'InvalidArgumentException',
+            '\Psr\Log\InvalidArgumentException',
             "Unkown level: 'xyz'! Level MUST be defined in \Psr\Log\LogLevel class."
         );
-        $oLogger = new ColoredIndentedLogger(array(), ' ', '+', '-', LogLevel::DEBUG);
+        $oLogger = new ColoredIndentedLogger(array());
         $oLogger->log('xyz', 'Message');
     }
 
     /**
-     * @covers \GAubry\Logger\AbstractLogger::__construct
      * @covers \GAubry\Logger\ColoredIndentedLogger::__construct
      * @covers \GAubry\Logger\ColoredIndentedLogger::log
-     * @dataProvider providerTestLog_MinMsgLevel
+     * @dataProvider dataProviderTestLogMinMsgLevel
+     *
+     * @param string $sMinMsgLevel
+     * @param string $sLevel
+     * @param string $sMessage
+     * @param string $sExpectedMessage
      */
-    public function testLog_MinMsgLevel ($sMinMsgLevel, $sLevel, $sMessage, $sExpectedMessage)
+    public function testLogMinMsgLevel ($sMinMsgLevel, $sLevel, $sMessage, $sExpectedMessage)
     {
-        $oLogger = new ColoredIndentedLogger(array(), ' ', '+', '-', $sMinMsgLevel);
+        $oLogger = new ColoredIndentedLogger(array('min_message_level' => $sMinMsgLevel));
         $sExpectedResult = $sExpectedMessage . (strlen($sExpectedMessage) > 0 ? PHP_EOL : '');
-//         $this->expectOutputString($sExpectedResult);
-        $this->expectOutputString(str_replace('\033', "\033", $sExpectedResult));
+        $this->expectOutputString($sExpectedResult);
         $oLogger->log($sLevel, $sMessage);
     }
 
-    public function providerTestLog_MinMsgLevel ()
+    /**
+     * Data provider of testLogMinMsgLevel().
+     *
+     * @return array
+     */
+    public function dataProviderTestLogMinMsgLevel ()
     {
-        return array(
-            array(LogLevel::DEBUG, LogLevel::DEBUG, 'Message', 'Message'),
-            array(LogLevel::DEBUG, LogLevel::ERROR, 'Message', 'Message'),
-            array(LogLevel::DEBUG, LogLevel::EMERGENCY, 'Message', 'Message'),
-
-            array(LogLevel::ERROR, LogLevel::DEBUG, 'Message', ''),
-            array(LogLevel::ERROR, LogLevel::ERROR, 'Message', 'Message'),
-            array(LogLevel::ERROR, LogLevel::EMERGENCY, 'Message', 'Message'),
-
-            array(LogLevel::EMERGENCY, LogLevel::DEBUG, 'Message', ''),
-            array(LogLevel::EMERGENCY, LogLevel::ERROR, 'Message', ''),
-            array(LogLevel::EMERGENCY, LogLevel::EMERGENCY, 'Message', 'Message'),
+        $aLevels = array(
+            LogLevel::DEBUG,
+            LogLevel::INFO,
+            LogLevel::NOTICE,
+            LogLevel::WARNING,
+            LogLevel::ERROR,
+            LogLevel::CRITICAL,
+            LogLevel::ALERT,
+            LogLevel::EMERGENCY
         );
+
+        $aTests = array();
+        foreach ($aLevels as $idxMin => $iMinMsgLevel) {
+            foreach ($aLevels as $idx => $iMsgLevel) {
+                $sExpectedMsg = ($idxMin > $idx ? '' : 'Message');
+                $aTests[] = array($iMinMsgLevel, $iMsgLevel, 'Message', $sExpectedMsg);
+            }
+        }
+        return $aTests;
     }
 
     /**
      * @covers \GAubry\Logger\ColoredIndentedLogger::log
-     * @dataProvider providerTestLog_WithLevelSpecificMethods
+     * @dataProvider dataProviderTestLogWithLevelSpecificMethods
+     *
+     * @param string $sLevel
      */
-    public function testLog_WithLevelSpecificMethods ($sLevel)
+    public function testLogWithLevelSpecificMethods ($sLevel)
     {
         $sMessage = 'Message';
         $aContext = array('key' => 'value');
@@ -106,7 +118,12 @@ class ColoredIndentedLoggerTest extends \PHPUnit_Framework_TestCase
         $oMockLogger->$sLevel($sMessage, $aContext);
     }
 
-    public function providerTestLog_WithLevelSpecificMethods ()
+    /**
+     * Data provider of testLogWithLevelSpecificMethods().
+     *
+     * @return array
+     */
+    public function dataProviderTestLogWithLevelSpecificMethods ()
     {
         return array(
             array(LogLevel::DEBUG),
@@ -121,21 +138,29 @@ class ColoredIndentedLoggerTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @param unknown $sMessage
-     * @param array $aContext
-     * @param unknown $sExpectedMessage
      * @covers \GAubry\Logger\ColoredIndentedLogger::log
-     * @covers \GAubry\Logger\AbstractLogger::_interpolateContext
-     * @dataProvider providerTestLog_WithContext
+     * @dataProvider dataProviderTestLogWithContext
+     *
+     * @param string $sMessage
+     * @param array $aContext
+     * @param string $sExpectedMessage
      */
-    public function testLog_WithContext ($sMessage, array $aContext, $sExpectedMessage)
+    public function testLogWithContext ($sMessage, array $aContext, $sExpectedMessage)
     {
         $oLogger = new ColoredIndentedLogger(array(), ' ', '+', '-', LogLevel::DEBUG);
-        $this->expectOutputString($sExpectedMessage . PHP_EOL);
+        if (strlen($sExpectedMessage) > 0) {
+            $sExpectedMessage .= PHP_EOL;
+        }
+        $this->expectOutputString($sExpectedMessage);
         $oLogger->log(LogLevel::INFO, $sMessage, $aContext);
     }
 
-    public function providerTestLog_WithContext ()
+    /**
+     * Data provider of testLogWithContext().
+     *
+     * @return array
+     */
+    public function dataProviderTestLogWithContext ()
     {
         return array(
             array('', array(), ''),
@@ -155,25 +180,38 @@ class ColoredIndentedLoggerTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @param unknown $sMessage
-     * @param unknown $sExpectedMessage
      * @covers \GAubry\Logger\ColoredIndentedLogger::log
-     * @dataProvider providerTestLog_WithIndent
+     * @covers \GAubry\Logger\ColoredIndentedLogger::processLeadingIndentationTags
+     * @covers \GAubry\Logger\ColoredIndentedLogger::processTrailingIndentationTags
+     * @dataProvider dataProviderTestLogWithIndent
+     *
+     * @param array $aMessages
+     * @param string $sExpectedMessage
      */
-    public function testLog_WithIndent (array $aMessages, $sExpectedMessage)
+    public function testLogWithIndent (array $aMessages, $sExpectedMessage)
     {
-        $oLogger = new ColoredIndentedLogger(array(), "  ", '+++', '---', LogLevel::DEBUG);
+        $aConfig = array(
+            'base_indentation'     => '  ',
+            'indent_tag'           => '+++',
+            'unindent_tag'         => '---'
+        );
+        $oLogger = new ColoredIndentedLogger($aConfig);
         $this->expectOutputString($sExpectedMessage);
         foreach ($aMessages as $sMessage) {
             $oLogger->log(LogLevel::INFO, $sMessage, array());
         }
     }
 
-    public function providerTestLog_WithIndent ()
+    /**
+     * Data provider of testLogWithIndent().
+     *
+     * @return array
+     */
+    public function dataProviderTestLogWithIndent ()
     {
         $N = PHP_EOL;
         return array(
-            array(array(''), "$N"),
+            array(array(''), ''),
             array(array('bla'), "bla$N"),
 
             array(array('+++bla'), "  bla$N"),
@@ -183,6 +221,9 @@ class ColoredIndentedLoggerTest extends \PHPUnit_Framework_TestCase
             array(array('++++++bla'), "    bla$N"),
             array(array('+++---bla'), "bla$N"),
             array(array('---+++bla'), "  bla$N"),
+            array(array('------+++bla'), "  bla$N"),
+            array(array('+++------+++bla'), "  bla$N"),
+            array(array('++++++---+++bla'), "    bla$N"),
 
             array(array('bla+++bla'), "bla+++bla$N"),
             array(array('bla---bla'), "bla---bla$N"),
@@ -202,22 +243,40 @@ class ColoredIndentedLoggerTest extends \PHPUnit_Framework_TestCase
 
     /**
      * @covers \GAubry\Logger\ColoredIndentedLogger::log
-     * @covers \GAubry\Logger\ColoredIndentedLogger::_buildColorTags
-     * @dataProvider providerTestLog_WithColor
+     * @covers \GAubry\Logger\ColoredIndentedLogger::buildColorTags
+     * @dataProvider dataProviderTestLogWithColor
+     *
+     * @param string $sLevelMsg
+     * @param string $sMessage
+     * @param string $sExpectedMessage
      */
-    public function testLog_WithColor ($sLevelMsg, $sMessage, $sExpectedMessage)
+    public function testLogWithColor ($sLevelMsg, $sMessage, $sExpectedMessage)
     {
-        $aColors = array(
-            'emergency' => '[RED]',
-            'title' => '[WHITE]',
-            'ok' => '[GREEN]',
+        $aConfig = array(
+            'colors' => array(
+                'emergency' => '[RED]',
+                'title' => '[WHITE]',
+                'ok' => '[GREEN]',
+            ),
+            'base_indentation'     => '  ',
+            'indent_tag'           => '+++',
+            'unindent_tag'         => '---',
+            'reset_color_sequence' => '[RESET]',
         );
-        $oLogger = new ColoredIndentedLogger($aColors, "  ", '+++', '---', LogLevel::DEBUG, '[RESET]', 'C.');
-        $this->expectOutputString($sExpectedMessage . PHP_EOL);
+        $oLogger = new ColoredIndentedLogger($aConfig);
+        if (strlen($sExpectedMessage) > 0) {
+            $sExpectedMessage .= PHP_EOL;
+        }
+        $this->expectOutputString($sExpectedMessage);
         $oLogger->log($sLevelMsg, $sMessage, array());
     }
 
-    public function providerTestLog_WithColor ()
+    /**
+     * Data provider of testLogWithColor().
+     *
+     * @return array
+     */
+    public function dataProviderTestLogWithColor ()
     {
         return array(
             array(LogLevel::INFO, '', ''),
@@ -227,6 +286,11 @@ class ColoredIndentedLoggerTest extends \PHPUnit_Framework_TestCase
             array(LogLevel::INFO, 'result: {C.ok}OK', 'result: [GREEN]OK[RESET]'),
             array(LogLevel::INFO, '{C.title}result: {C.ok}OK', '[WHITE]result: [GREEN]OK[RESET]'),
             array(LogLevel::EMERGENCY, '{C.title}result: {C.ok}OK', '[RED][WHITE]result: [GREEN]OK[RESET]'),
+
+            array(LogLevel::INFO, "a\nb", "a\nb"),
+            array(LogLevel::INFO, "+++a\nb", "  a\n  b"),
+            array(LogLevel::EMERGENCY, "a\nb", "[RED]a\n[RED]b[RESET]"),
+            array(LogLevel::EMERGENCY, "+++a\nb", "  [RED]a\n  [RED]b[RESET]"),
         );
     }
 }

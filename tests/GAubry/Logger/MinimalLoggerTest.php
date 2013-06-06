@@ -2,8 +2,8 @@
 
 namespace GAubry\Logger\Tests;
 
-use \GAubry\Logger\MinimalLogger;
-use \Psr\Log\LogLevel;
+use GAubry\Logger\MinimalLogger;
+use Psr\Log\LogLevel;
 
 class MinimalLoggerTest extends \PHPUnit_Framework_TestCase
 {
@@ -13,7 +13,6 @@ class MinimalLoggerTest extends \PHPUnit_Framework_TestCase
      */
     public function setUp ()
     {
-
     }
 
     /**
@@ -25,27 +24,24 @@ class MinimalLoggerTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @covers \GAubry\Logger\AbstractLogger::__construct
-     * @covers \GAubry\Logger\AbstractLogger::_checkMsgLevel
      * @covers \GAubry\Logger\MinimalLogger::__construct
      */
-    public function testConstruct_ThrowExceptionWhenBadMinMsgLevel ()
+    public function testConstructThrowExceptionWhenBadMinMsgLevel ()
     {
         $this->setExpectedException(
-            'InvalidArgumentException',
+            '\Psr\Log\InvalidArgumentException',
             "Unkown level: 'xyz'! Level MUST be defined in \Psr\Log\LogLevel class."
         );
         $oLogger = new MinimalLogger('xyz');
     }
 
     /**
-     * @covers \GAubry\Logger\AbstractLogger::_checkMsgLevel
      * @covers \GAubry\Logger\MinimalLogger::log
      */
-    public function testLog_ThrowExceptionWhenBadMinMsgLevel ()
+    public function testLogThrowExceptionWhenBadMinMsgLevel ()
     {
         $this->setExpectedException(
-            'InvalidArgumentException',
+            '\Psr\Log\InvalidArgumentException',
             "Unkown level: 'xyz'! Level MUST be defined in \Psr\Log\LogLevel class."
         );
         $oLogger = new MinimalLogger(LogLevel::DEBUG);
@@ -53,12 +49,16 @@ class MinimalLoggerTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @covers \GAubry\Logger\AbstractLogger::__construct
      * @covers \GAubry\Logger\MinimalLogger::__construct
      * @covers \GAubry\Logger\MinimalLogger::log
-     * @dataProvider providerTestLog_MinMsgLevel
+     * @dataProvider dataProviderTestLogMinMsgLevel
+     *
+     * @param string $sMinMsgLevel
+     * @param string $sLevel
+     * @param string $sMessage
+     * @param string $sExpectedMessage
      */
-    public function testLog_MinMsgLevel ($sMinMsgLevel, $sLevel, $sMessage, $sExpectedMessage)
+    public function testLogMinMsgLevel ($sMinMsgLevel, $sLevel, $sMessage, $sExpectedMessage)
     {
         $oLogger = new MinimalLogger($sMinMsgLevel);
         $sExpectedResult = $sExpectedMessage . (strlen($sExpectedMessage) > 0 ? PHP_EOL : '');
@@ -66,7 +66,12 @@ class MinimalLoggerTest extends \PHPUnit_Framework_TestCase
         $oLogger->log($sLevel, $sMessage);
     }
 
-    public function providerTestLog_MinMsgLevel ()
+    /**
+     * Data provider of testLogMinMsgLevel().
+     *
+     * @return array()
+     */
+    public function dataProviderTestLogMinMsgLevel ()
     {
         return array(
             array(LogLevel::DEBUG, LogLevel::DEBUG, 'Message', 'Message'),
@@ -85,9 +90,11 @@ class MinimalLoggerTest extends \PHPUnit_Framework_TestCase
 
     /**
      * @covers \GAubry\Logger\MinimalLogger::log
-     * @dataProvider providerTestLog_WithLevelSpecificMethods
+     * @dataProvider dataProviderTestLogWithLevelSpecificMethods
+     *
+     * @param string $sLevel
      */
-    public function testLog_WithLevelSpecificMethods ($sLevel)
+    public function testLogWithLevelSpecificMethods ($sLevel)
     {
         $sMessage = 'Message';
         $aContext = array('key' => 'value');
@@ -100,7 +107,12 @@ class MinimalLoggerTest extends \PHPUnit_Framework_TestCase
         $oMockLogger->$sLevel($sMessage, $aContext);
     }
 
-    public function providerTestLog_WithLevelSpecificMethods ()
+    /**
+     * Data provider of testLogWithLevelSpecificMethods().
+     *
+     * @return array()
+     */
+    public function dataProviderTestLogWithLevelSpecificMethods ()
     {
         return array(
             array(LogLevel::DEBUG),
@@ -115,21 +127,26 @@ class MinimalLoggerTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @param unknown $sMessage
-     * @param array $aContext
-     * @param unknown $sExpectedMessage
      * @covers \GAubry\Logger\MinimalLogger::log
-     * @covers \GAubry\Logger\AbstractLogger::_interpolateContext
-     * @dataProvider providerTestLog_WithContext
+     * @dataProvider dataProviderTestLogWithContext
+     *
+     * @param string $sMessage
+     * @param array $aContext
+     * @param string $sExpectedMessage
      */
-    public function testLog_WithContext ($sMessage, array $aContext, $sExpectedMessage)
+    public function testLogWithContext ($sMessage, array $aContext, $sExpectedMessage)
     {
         $oLogger = new MinimalLogger(LogLevel::DEBUG);
         $this->expectOutputString($sExpectedMessage . PHP_EOL);
         $oLogger->log(LogLevel::INFO, $sMessage, $aContext);
     }
 
-    public function providerTestLog_WithContext ()
+    /**
+     * Data provider of testLogWithContext().
+     *
+     * @return array()
+     */
+    public function dataProviderTestLogWithContext ()
     {
         return array(
             array('', array(), ''),
