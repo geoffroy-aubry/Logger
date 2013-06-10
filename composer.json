@@ -19,7 +19,8 @@
         "phpunit/phpunit":           ">=3.7",
         "phpmd/phpmd":               "1.4.*",
         "squizlabs/php_codesniffer": "1.4.*",
-        "satooshi/php-coveralls":    "dev-master"
+        "satooshi/php-coveralls":    "dev-master",
+        "apigen/apigen":             "2.8.0"
     },
     "autoload": {
         "psr-0": {"GAubry\\Logger": "src/"}
