@@ -1,4 +1,6 @@
 # Colored and Indented Logger
+
+[![Latest stable version](https://poser.pugx.org/geoffroy-aubry/Logger/v/stable.png "Latest stable version")](https://packagist.org/packages/geoffroy-aubry/Logger)
 [![Build Status](https://secure.travis-ci.org/geoffroy-aubry/Logger.png?branch=stable)](http://travis-ci.org/geoffroy-aubry/Logger)
 [![Coverage Status](https://coveralls.io/repos/geoffroy-aubry/Logger/badge.png?branch=stable)](https://coveralls.io/r/geoffroy-aubry/Logger)
  
