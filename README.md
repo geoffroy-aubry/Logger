@@ -3,6 +3,7 @@
 [![Latest stable version](https://poser.pugx.org/geoffroy-aubry/Logger/v/stable.png "Latest stable version")](https://packagist.org/packages/geoffroy-aubry/Logger)
 [![Build Status](https://secure.travis-ci.org/geoffroy-aubry/Logger.png?branch=stable)](http://travis-ci.org/geoffroy-aubry/Logger)
 [![Coverage Status](https://coveralls.io/repos/geoffroy-aubry/Logger/badge.png?branch=stable)](https://coveralls.io/r/geoffroy-aubry/Logger)
+[![Dependency Status](https://www.versioneye.com/user/projects/53542d6cfe0d071c050010ef/badge.png)](https://www.versioneye.com/user/projects/53542d6cfe0d071c050010ef)
  
 [PSR-3](https://github.com/php-fig/fig-standards/blob/master/accepted/PSR-3-logger-interface.md)
 logger for adding colors and indentation on PHP CLI output.
@@ -147,6 +148,7 @@ See [CHANGELOG](CHANGELOG.md) file for details.
 
 [![Build Status](https://secure.travis-ci.org/geoffroy-aubry/Logger.png?branch=stable)](http://travis-ci.org/geoffroy-aubry/Logger)
 [![Coverage Status](https://coveralls.io/repos/geoffroy-aubry/Logger/badge.png?branch=stable)](https://coveralls.io/r/geoffroy-aubry/Logger)
+[![Dependency Status](https://www.versioneye.com/user/projects/53542d6cfe0d071c050010ef/badge.png)](https://www.versioneye.com/user/projects/53542d6cfe0d071c050010ef)
 
 Following commands are executed during each build and must report neither errors nor warnings:
 
